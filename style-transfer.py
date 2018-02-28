@@ -11,20 +11,25 @@
 # <img src="notebook_images/style_transfer_example.png"/>
 # 
 # <h4>The Paper:</h4>
-# <p>The idea came about by Leon A. Gatys et al. who plublished <i><a href="https://arxiv.org/pdf/1508.06576.pdf">A Neural Algorithm of Artistic Style</a></i> in 2015. They proposed style transfer as an optimisation problem which can be solved through training a neural network. Specifically, the authors use a pre-trained convolutional neural network, called the VGG16 model, that has already developed intuition for some internal representation of content and style within a given image.</p>
+# <p>The idea came about by Leon A. Gatys et al. who plublished <i><a href="https://arxiv.org/pdf/1508.06576.pdf">A Neural Algorithm of Artistic Style</a></i> in 2015. They proposed style transfer as an optimization problem which can be solved through training a neural network. Specifically, the authors use a pre-trained convolutional neural network, called the VGG16 model, that has already developed intuition for some internal representation of content and style within a given image.</p>
 # <br>
 # 
 # <center><h2><u>Prerequisites</u></h2></center>
 # <br>
 # 
+# <h4>Neural Network:</h4>
+# <p>A specific model within the field of deep learning that attempts to mimic how the human brain process information. The neural network moves input data forward through a series layers and calculating weights to create a prediction. The prediction is then compared to the actual value and the network moves backwards to update the weights. The network produces a function $f$ that takes in an input $x$ and produces an output $y$ such that $f(x) = y$.</p>
+# 
 # <h4>Convolutional Layers:</h4>
 # <p>Convolution is a mathematical operation that takes a kernel, a fixed square window of weights, and sums the pixel values of the image within the kernel window multiplied by the corresponding kernel weight. Convolution tries to detect the presence of a feature within the kernel window and produces a new window of numbers called a feature map. For example:</p>
 # <img src="notebook_images/convolution_1.png"/>
 # <img src="notebook_images/convolution_2.gif"/>
-# <p>Convolutional layers in neural networks are industry standard for performing tasks such as image classification.</p>
+# <p>Convolutional layers in neural networks are industry standard for performing tasks such as image classification. The feature maps give us some intuition about what is in the content of an image.</p>
 # 
 # <h4>Fully Connected Layers:</h4>
-# <p>A fully connected layer takes an input and multiplies it by a weight matrix and then adds a bias vector. At the end of a convolutional neural network it is common to find a series of fully connected layers. The output in a convolutional layer represents high-level features in the data. Adding a fully connected layer is an easy and cheap way of learning non-linear combinations of these features. Essentially the convolutional layers are providing a meaningful, low-dimensional, and somewhat invariant feature space, and the fully-connected layer is learning a (possibly non-linear) function in that space.</p>
+# <p>A fully connected layer takes an input and multiplies it by a weight matrix and then adds a bias vector.</p>
+# <img src="notebook_images/fully_connected_layer.png" style="width:300px;height:350px"/>
+# <p>At the end of a convolutional neural network it is common to find a series of fully connected layers. The output in a convolutional layer represents high-level features in the data. Adding a fully connected layer is an easy and cheap way of learning non-linear combinations of these features. Essentially the convolutional layers are providing a meaningful, low-dimensional, and somewhat invariant feature space, and the fully-connected layer is learning a (possibly non-linear) function in that space.</p>
 # 
 # 
 # <h4>Rectified Linear Units (ReLus):</h4>
@@ -34,17 +39,20 @@
 # <h4>Max Pooling:</h4>
 # <p>Max Pooling is a down-sampling operation on an input representation, it reduces dimensionality and allows for assumptions to be made about features contained in a binned sub-region. The process is as follows:</p>
 # <img src="notebook_images/max_pooling.png"/>
-# <p>Max pooling allows some sense of translational invariance.</p> 
+# <p>Max pooling allows some sense of translational invariance. For instance, max pooling allows us to learn that a face has the following components: eyes, nose, lips, and ears. Translational invariance means that as long as these components are present in an image, it does not matter what arangement the components are in. For example: </p> 
+# <img src="notebook_images/max_pooling_2.png"/>
+# <p>Above, both images would be classified as a face in a network that uses maxpooling as the components for a face are present in both images.</p>
+# 
 # 
 # <h4>VGG Network:</h4>
 # <p>ImageNet is a large scale visual recognition challenge where teams compete to classify millions of images with objects that come from almost 1,000 categories. In 2014, the Visual Geometry Group (VGG) from Oxford University, won this challenge with a classification error rate of only 7.0%. Gatys et. al used this pretrained network for their application of style transfer. The network consists of 16 layers of convolution and ReLU non-linearity, separated by 5 pooling layers and ending in 3 fully connected layers. The architecture is as follows:</p>
 # <img src="notebook_images/vgg_architecture.png"/>
 # 
 # <h4>Content Representation:</h4>
-# <p>Networks that have been trained for the task of object recognition learn which features it is important to extract from an image in order to identify its content. The feature maps in the convolution layers of the network can be seen as the network's internal representation of the image content.</p>
+# <p>Content is defined as what is in the image. For instance, if we had a picture of the Mona Lisa, the face and body of the painting would be the content. Networks that have been trained for the task of object recognition learn which features it is important to extract from an image in order to identify its content. The feature maps in the convolution layers of the network can be seen as the network's internal representation of the image content. Thus, we can represent the content of an image by extracting the feature map from the convolutional layers in a neural network.</p>
 # 
 # <h4>Style Representation:</h4>
-# <p>The style of an image is not well captured by simply looking at the values of a feature map from the convolutional layer in the neural network. However, Gatys et. al found that we can extract a style representation by looking at the spatial correlation of the values within the feature map. To do this, the Gram matrix of the feature map is calculated. If we have a feature map $F$ represented as a matrix then the Gram matrix $G$ can be calculated with each entry $G_{ij} = \sum_{k}F_{ik}F_{jk}$. Using this, we can see that if we had two images whose feature maps at a given layer produced the same Gram matrix then we would find that the two images had similar style, but not necessairly similar content. Gram et. al found that the best results for style representation came from applying the gram matrix to a combination of shallow and deep layers. Applying this to early layers in the network would capture some of the finer textures contained within the image whereas applying this to deeper layers would capture more higher-level elements of the image’s style. </p>
+# <p>Style of an image is defined as the way in which the content is presented. For instance, the color and swirly nature in the Starry Night painting represents the style of the paining. The style of an image is not well captured by simply looking at the values of a feature map from the convolutional layer in the neural network. However, Gatys et. al found that we can extract a style representation by looking at the spatial correlation of the values within the feature map. To do this, the Gram matrix of the feature map is calculated. If we have a feature map $F$ represented as a matrix then the Gram matrix $G$ can be calculated with each entry $G_{ij} = \sum_{k}F_{ik}F_{jk}$. Using this, we can see that if we had two images whose feature maps at a given layer produced the same Gram matrix then we would find that the two images had similar style, but not necessairly similar content. Gram et. al found that the best results for style representation came from applying the gram matrix to a combination of shallow and deep layers. Applying this to early layers in the network would capture some of the finer textures contained within the image whereas applying this to deeper layers would capture more higher-level elements of the image’s style. </p>
 # 
 # <h4>Optimization:</h4>
 # <p>With style transfer we have the task of generating a new image $Y$, whose style is equal to a style image $S$ and whose content is equal to a content image $C$. Thus, we have to define a loss for our content and style. Let $l$ be a chosen content layer, then the content loss is defined as the euclidean distance between the feature map $F^{l}$ of our content image $C$ and the feature map $P^{l}$ of our generated image $Y$. We define the content loss $$L_{\text{content}} = \frac{1}{2}\sum_{ij}\left(F_{ij}^l - P_{ij}^l\right)^2$$.
@@ -61,7 +69,7 @@
 
 # <center><h2><u>Code</u></h2></center>
 
-# In[55]:
+# In[3]:
 
 
 #Imports 
@@ -71,6 +79,9 @@ import numpy as np
 
 #Image Handling 
 from PIL import Image
+
+#Plotting 
+import matplotlib.pyplot as plt
 
 #Deep Learning 
 from keras import backend as K 
@@ -214,11 +225,24 @@ def get_grad(gImArr):
 
 # <h4>Step 9: Instantiate Model:</h4>
 
+# In[6]:
+
+
+#The Content Image 
+print("Content Image: ")
+plt.imshow(Image.open("content_images/eiffel_tower.jpg"))
+plt.show()
+#The Style Image
+print("\nStyle Image:")
+plt.imshow(Image.open("style_images/starry_night_van_goh.jpg"))
+plt.show()
+
+
 # In[59]:
 
 
 #Paths for content and style images 
-content_image_path = "content_images/tech_tower.jpg"
+content_image_path = "content_images/eiffel_tower.jpg"
 style_image_path = "style_images/starry_night_van_goh.jpg"
 
 #Content Image Properties 
@@ -226,7 +250,7 @@ cImageOrig = Image.open(content_image_path)
 cImageSizeOrig = cImageOrig.size
 
 #Path for output image 
-genImOutputPath = "results/starry_tech_tower_500.jpg"
+genImOutputPath = "results/eiffel_tower_starry_night.jpg"
 
 #Target height/width for images
 targetHeight = 512 
@@ -235,13 +259,15 @@ cImageArr, sImageArr, gImage, gImPlaceholder = preprocessImage(content_image_pat
                                             style_image_path,targetHeight,targetWidth)
 
 
-
-
+#Setup Session 
 tf_session = K.get_session()
+
+#Select Models
 cModel = VGG16(include_top=False, weights='imagenet', input_tensor=cImageArr)
 sModel = VGG16(include_top=False, weights='imagenet', input_tensor=sImageArr)
 gModel = VGG16(include_top=False, weights='imagenet', input_tensor=gImPlaceholder)
 
+#Select layers for content and style
 cLayerName = 'block4_conv2'
 sLayerNames = [
                 'block1_conv1',
@@ -250,13 +276,16 @@ sLayerNames = [
                 'block4_conv1',
                 ]
 
+#Get initial feature representations
 P = getFeatureRepresentation(x=cImageArr, layer_names=[cLayerName], model=cModel)
 P = P[0]
 As = getFeatureRepresentation(x=sImageArr,layer_names=sLayerNames,model=sModel)
 ws = np.ones(len(sLayerNames))/float(len(sLayerNames))
 
+#Number of training epochs
 iterations = 500 
 
+#Minimize the loss using the L-BFGS-B algorithm
 x_val = gImage.flatten()
 xopt, f_val, info= fmin_l_bfgs_b(calculate_loss, x_val, fprime=get_grad,
                             maxiter=iterations, disp=True)
@@ -296,6 +325,20 @@ xOut = postprocess_array(xopt)
 xIm = save_original_size(xOut)
 
 
+# In[9]:
+
+
+#View Generated Image 
+#Result 
+print("Style Transfer Image:")
+plt.imshow(Image.open("results/eiffel_tower_starry_night.jpg"))
+plt.show()
+
+
+# <h4>The Training Process:</h4>
+
+# <img src="results/process.gif"/>
+
 # <h4>Tips:</h4>
 # <ul>
 # <li><b>Different Weightings:</b> Try setting $\alpha$ and $\beta$ to different values. Typically we want $\frac{\beta}{\alpha} \sim 10^5$</li>
@@ -305,28 +348,31 @@ xIm = save_original_size(xOut)
 # </ul>
 
 # <h4>Bonus:</h4>
-# <p>We can build the VGG16 architecture in Keras that the style transfer model uses.</p>
+# <p>The Neural Style Transfer model uses the VGG16 architecture. This architecture can be built in keras as follows:</p>
 
 # In[ ]:
 
 
 #Imports 
-from keras.models import Sequential
+from keras.models import port Sequential
 from keras.layers import Input, Dense, Flatten, Conv2D, MaxPooling2D
 from keras.optimizers import SGD
 
 
-# In[ ]:
+# In[11]:
 
 
+#Define an input shape
 inpt_shpe = (150,150,3)
+output_dim = 10
 
-def VGG16(inpt_shpe): 
+#Define the number of classes to output in the multi-class classification problem
+def VGG16(inpt_shpe,output_dim): 
     
     #Initialize Model
     model = Sequential()
     #model.add(InputLayer(input_shape=inpt_shpe))
-    model.add(Input(inpt_shape=inpt_shpe))
+    model.add(Input(input_shape=inpt_shpe))
     
     #Block 1
     model.add(Conv2D(64, (3, 3), activation='relu', padding='same'))
@@ -360,7 +406,7 @@ def VGG16(inpt_shpe):
     model.add(Flatten(name='flatten'))
     model.add(Dense(4096,activation='relu',name='fc1'))
     model.add(Dense(4096,activation='relu',name='fc2'))
-    model.add(Dense(classes,activation='softmax',name='predictions'))
+    model.add(Dense(output_dim,activation='softmax',name='predictions'))
     
     #Compile model with stochastic gradient descent optimizer
     sgd = SGD(lr=0.1, decay=1e-6, momentum=0.9, nesterov=True)
