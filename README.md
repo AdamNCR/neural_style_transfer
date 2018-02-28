@@ -8,7 +8,7 @@ Deep Dream uses neural style transfer and its implementation can be found in Dee
 # Links 
 HTML versions of the ipynbs can be found at 
 
-⋅⋅* https://adamncr.github.io/neural_style_transfer/style-transfer.html 
+1. https://adamncr.github.io/neural_style_transfer/style-transfer.html 
 
-⋅⋅* https://adamncr.github.io/neural_style_transfer/DeepDream.html
+2. https://adamncr.github.io/neural_style_transfer/DeepDream.html
 
